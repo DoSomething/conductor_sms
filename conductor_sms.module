@@ -19,16 +19,22 @@ function conductor_sms_ctools_plugin_api($owner, $api) {
 }
 
 /**
- * Implements hook_sms_mobile_commons_response_alter().
+ * Takes context given from a message and runs it through a ConductorWorkflow
+ * to generate a response.
+ *
+ * @param string &$output
+ *   The output response message
+ * @param array $context
+ *   Context values defining the message received
  */
-function conductor_sms_sms_mobile_commons_response_alter(&$output, $context) {
+function conductor_sms_response(&$output, $context) {
 
   $keyword = $context['keyword'];
   $number = $context['sender'];
   $message = $context['message'];
 
   $storage = conductor_get_storage_handler(variable_get('conductor_default_storage_handler', 'database'));
-  
+
   $startNewWorkflow = FALSE;
 
   // Allow modules to specify sms keyword / workflow matches by implementing
@@ -107,7 +113,7 @@ function conductor_sms_sms_mobile_commons_response_alter(&$output, $context) {
     }
     elseif ($workflow->getState()->getContext('sms_response')) {
       $output = $workflow->getState()->getContext('sms_response');
-    } 
+    }
 
 
     if (empty($output)) {
